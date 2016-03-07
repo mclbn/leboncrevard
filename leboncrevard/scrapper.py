@@ -48,46 +48,55 @@ class LbcScrapper:
             print("Request failed, status code is {:d}", req.status_code)
             return None
         soup = BeautifulSoup(req.content, "lxml")
-        ads = soup.find('div', {"class": "list-lbc"})
+        ads = soup.find('ul', {"class": "tabsContent dontSwitch block-white"})
         if ads == None:
             print("No ads!")
             return None
-        for a in ads.find_all('a'):
+        for li in ads.find_all('li'):
+            a = li.find('a')
+            title = a['title']
+            link = "http:" + a['href']
+            datestr = ""
             try:
-                a['class']
-            except KeyError:
-                title = a['title']
-                link = "http:" + a['href']
-                datestr = ""
+                ass = a.find('aside', {"class": "item_absolute"})
+                p = ass.find('p');
+                for child in p.children:
+                    if (len(child.string) > 1):
+                        datestr += child.string
+                        datestr += " "
+                datestr = re.sub('[\n+]', '', datestr).strip()
+            except:
+                print("Could not get date.")
+            try:
+                price = a.find('h3', {"class": "item_price"}).string.strip()
+            except:
+                price = ""
+            try:
+                ps = a.find_all('p', {"class": "item_supp"})
+            except:
+                print("No price")
+            placement = ""
+            for p in ps:
+                if p and p.string:
+                    if p.string.count("\n") > 4: # This is the only way I found to differentiate these fields...
+                        placement = re.sub('[\s+]', '', p.string)
+                        break
+            try:
+                ad_req = requests.get(link)
+                if (ad_req.status_code != 200):
+                    print("Request failed, status code is {:d}", ad_req.status_code)
+                    return
+                ad_soup = BeautifulSoup(ad_req.content, "lxml")
                 try:
-                    date = a.find('div', {"class": "date"})
-                    for child in date.children:
-                        if (len(child.string) > 1):
-                            datestr += child.string
-                            datestr += " "
-                    datestr = re.sub('[\n+]', '', datestr).strip()
-                except:
-                    datestr = ""
-                try:
-                    price = a.find('div', {"class": "price"}).string.strip()
-                except:
-                    price = ""
-                try:
-                    placement = re.sub('[\s+]', '', a.find('div', {"class": "placement"}).string)
-                except:
-                    placement = ""
-                try:
-                    ad_req = requests.get(link)
-                    if (ad_req.status_code != 200):
-                        print("Request failed, status code is {:d}", ad_req.status_code)
-                        return
-                    ad_soup = BeautifulSoup(ad_req.content, "lxml")
-                    description = ad_soup.find('div', {"class": "content"})
+                    description = ad_soup.find('div', {"class": "line properties_description"})
                     m = hashlib.md5()
                     m.update(description.text.encode('utf-8'))
                     content_hash = m.hexdigest()
                 except:
+                    print("No description!")
                     content_hash = ""
-                ad = LbcAd(title, link, datestr, price, placement, content_hash)
-                ad_list.append(ad)
+            except:
+                content_hash = ""
+            ad = LbcAd(title, link, datestr, price, placement, content_hash)
+            ad_list.append(ad)
         return ad_list

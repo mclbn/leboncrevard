@@ -76,6 +76,10 @@ class LbcScheduler:
         self.load_jobs()
         self.unload_jobs()
 
+    def run_jobs_now(self):
+        for job in self.jobs:
+            job.run()
+
     def start(self):
         schedule.every(1).minutes.do(self.update_jobs)
         self.running = True
