@@ -48,7 +48,7 @@ class LbcScrapper:
             print("Request failed, status code is {:d}", req.status_code)
             return None
         soup = BeautifulSoup(req.content, "lxml")
-        ads = soup.find('ul', {"class": "tabsContent dontSwitch block-white"})
+        ads = soup.find('section', {"class": "tabsContent block-white dontSwitch"})
         if ads == None:
             print("No ads!")
             return None
