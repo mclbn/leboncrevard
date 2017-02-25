@@ -1,5 +1,10 @@
-import schedule, time, csv, config
-from leboncrevard import scrapper, job
+import csv
+import time
+
+import schedule
+
+from leboncrevard import config, job
+
 
 class LbcScheduler:
     def __init__(self):
@@ -32,7 +37,6 @@ class LbcScheduler:
 
     def unload_job(self, row):
         j = self.parse_job(row)
-        nb_job = 0
         for loaded_job in self.jobs:
             if j == loaded_job:
                 loaded_job.disable()
@@ -41,44 +45,38 @@ class LbcScheduler:
         print("No such job, ignoring.\n")
 
     def load_jobs(self):
-        print("Loading new jobs from " + config.job_file + ": \n")
+        print("Loading new jobs from " + config.JOB_FILE + ": \n")
         try:
-            cr = csv.reader(open(config.job_file ,"r"))
-        except Exception as e:
-            print("Could not parse " + config.job_file + ", no jobs loaded.")
-            return
-        line = 0
-        for row in cr:
-            line = line + 1
-            try:
-                self.load_job(row)
-            except Exception as e:
-                print("Could not parse (and ignoring) line: " + str(line))
-                pass
+            with csv.reader(open(config.JOB_FILE, "r")) as cr:
+                line = 0
+                for row in cr:
+                    line = line + 1
+                    self.load_job(row)
+        except IOError:
+            print("Could not parse " + config.JOB_FILE + ", no jobs loaded.")
+        except Exception:
+            print("Could not parse (and ignoring) line: " + str(line))
 
     def unload_jobs(self):
-        print("Unloading jobs mentionned in " + config.delete_file + ": \n")
+        print("Unloading jobs mentionned in " + config.DELETE_FILE + ": \n")
         try:
-            cr = csv.reader(open(config.delete_file ,"r"))
-        except Exception as e:
-            print("Could not parse " + config.delete_file + ", no jobs unloaded.")
-            return
-        line = 0
-        for row in cr:
-            line = line + 1
-            try:
-                self.unload_job(row)
-            except Exception as e:
-                print("Could not parse (and ignoring) line: " + str(line))
-                pass
+            with csv.reader(open(config.DELETE_FILE, "r")) as cr:
+                line = 0
+                for row in cr:
+                    line = line + 1
+                    self.unload_job(row)
+        except IOError:
+            print("Could not parse " + config.DELETE_FILE + ", no jobs unloaded.")
+        except Exception:
+            print("Could not parse (and ignoring) line: " + str(line))
 
     def update_jobs(self):
         self.load_jobs()
         self.unload_jobs()
 
     def run_jobs_now(self):
-        for job in self.jobs:
-            job.run()
+        for job_to_run in self.jobs:
+            job_to_run.run()
 
     def start(self):
         schedule.every(1).minutes.do(self.update_jobs)
@@ -86,3 +84,9 @@ class LbcScheduler:
         while (self.running):
             schedule.run_pending()
             time.sleep(1)
+
+
+def main():
+    S = LbcScheduler()
+    S.update_jobs()
+    S.start()
