@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name='leboncrevard',
-    version='0.1',
+    version='0.1.1',
     description='Python scrapper / mailer for the french ad website leboncoin.fr',
     long_description=readme(),
     classifiers=[
