@@ -1,6 +1,10 @@
-import requests, pprint, re, html, hashlib
-from bs4 import BeautifulSoup
+import hashlib
+import re
 from urllib.parse import urlparse, urlsplit, parse_qsl
+
+import requests
+from bs4 import BeautifulSoup
+
 
 class LbcAd:
     def __init__(self, title, link, date, price, placement, content_hash):
@@ -27,6 +31,7 @@ class LbcAd:
         print("Price: " + self.price)
         print("Placement: " + self.placement)
         print("Hash: " + self.content_hash)
+
 
 class LbcScrapper:
     def __init__(self, url):
@@ -75,6 +80,7 @@ class LbcScrapper:
                 ps = a.find_all('p', {"class": "item_supp"})
             except:
                 print("No price")
+                ps = []
             placement = ""
             for p in ps:
                 if p and p.string:

@@ -1,5 +1,0 @@
-smtp_user="user"
-smtp_pass="pass"
-smtp_server="smtp.gmail.com:587"
-job_file="jobs.csv"
-delete_file="delete.csv"

@@ -10,11 +10,28 @@ I developed this small tool for two reasons:
 
 ## Usage
 
-- Install requirements : [requests](http://docs.python-requests.org), [schedule](https://github.com/dbader/schedule) & [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-- Clone the project
-- Change the value in `config.py` (an SMTP server that supports STARTTLS is mandatory, Gmail is fine)
-- Fill the "job file"" mentioned in `config.py` (see syntax below), default is `jobs.csv`
-- Run the script : `python run.py &>> leboncrevard.log`
+- Install the project:
+
+```shell
+$ pip install leboncrevard
+```
+
+- You can set the configuration with the following environment variables (an SMTP server that supports STARTTLS is mandatory, Gmail is fine):
+
+```shell
+$ export LBC_SMTP_USER="user"
+$ export LBC_SMTP_PASS="pass"
+$ export LBC_SMTP_SERVER="smtp.gmail.com:587"
+$ export LBC_JOB_FILE="jobs.csv"
+$ export LBC_DELETE_FILE="delete.csv"
+```
+
+- Fill the "job file" defined by `LBC_JOB_FILE` (see syntax below), default is `jobs.csv`
+- Run the application:
+
+```shell
+$ leboncrevard &>> leboncrevard.log
+```
 
 The entries in both of these files should look like this:
 

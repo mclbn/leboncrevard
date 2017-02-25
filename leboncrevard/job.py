@@ -1,6 +1,9 @@
-import smtplib, time, config
+import smtplib
+import time
 from email.mime.text import MIMEText
-from leboncrevard import scrapper
+
+from leboncrevard import scrapper, config
+
 
 class LbcJob:
     def __init__(self, name, url, interval, recipients):
@@ -65,12 +68,12 @@ class LbcJob:
                         print("Sending mail...")
                         msg = MIMEText(text)
                         msg['Subject'] = "Nouvelles annonces (" + self.name + ")"
-                        msg['From'] = config.smtp_user
+                        msg['From'] = config.SMTP_USER
                         msg['To'] = recipient
-                        s = smtplib.SMTP(config.smtp_server)
+                        s = smtplib.SMTP(config.SMTP_SERVER)
                         s.ehlo()
                         s.starttls()
-                        s.login(config.smtp_user, config.smtp_pass)
+                        s.login(config.SMTP_USER, config.SMTP_PASS)
                         s.send_message(msg)
                         s.quit()
                         f.write(hashes)

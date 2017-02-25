@@ -1,5 +1,10 @@
-import schedule, time, csv, config
-from leboncrevard import scrapper, job
+import csv
+import time
+
+import schedule
+
+from leboncrevard import config, job
+
 
 class LbcScheduler:
     def __init__(self):
@@ -41,11 +46,11 @@ class LbcScheduler:
         print("No such job, ignoring.\n")
 
     def load_jobs(self):
-        print("Loading new jobs from " + config.job_file + ": \n")
+        print("Loading new jobs from " + config.JOB_FILE + ": \n")
         try:
-            cr = csv.reader(open(config.job_file ,"r"))
+            cr = csv.reader(open(config.JOB_FILE ,"r"))
         except Exception as e:
-            print("Could not parse " + config.job_file + ", no jobs loaded.")
+            print("Could not parse " + config.JOB_FILE + ", no jobs loaded.")
             return
         line = 0
         for row in cr:
@@ -57,11 +62,11 @@ class LbcScheduler:
                 pass
 
     def unload_jobs(self):
-        print("Unloading jobs mentionned in " + config.delete_file + ": \n")
+        print("Unloading jobs mentionned in " + config.DELETE_FILE + ": \n")
         try:
-            cr = csv.reader(open(config.delete_file ,"r"))
+            cr = csv.reader(open(config.DELETE_FILE ,"r"))
         except Exception as e:
-            print("Could not parse " + config.delete_file + ", no jobs unloaded.")
+            print("Could not parse " + config.DELETE_FILE + ", no jobs unloaded.")
             return
         line = 0
         for row in cr:
@@ -86,3 +91,9 @@ class LbcScheduler:
         while (self.running):
             schedule.run_pending()
             time.sleep(1)
+
+
+def main():
+    S = LbcScheduler()
+    S.update_jobs()
+    S.start()
