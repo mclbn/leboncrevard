@@ -36,13 +36,13 @@ class LbcJob:
     def run(self):
         if not self.shouldrun:
             return
-        if (self.scrapper.test_connectivity() == False):
+        if self.scrapper.test_connectivity() is False:
             print("No connectivity, aborting for now...")
             return False
         else:
             print("Starting scraping job: " + self.name)
             ads = self.scrapper.scrap()
-            if ads == None:
+            if ads is None:
                 print("Nothing to scrap for " + self.name + ", aborting job.")
                 return False
             text = ""

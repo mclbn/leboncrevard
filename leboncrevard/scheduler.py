@@ -37,7 +37,6 @@ class LbcScheduler:
 
     def unload_job(self, row):
         j = self.parse_job(row)
-        nb_job = 0
         for loaded_job in self.jobs:
             if j == loaded_job:
                 loaded_job.disable()
@@ -48,42 +47,36 @@ class LbcScheduler:
     def load_jobs(self):
         print("Loading new jobs from " + config.JOB_FILE + ": \n")
         try:
-            cr = csv.reader(open(config.JOB_FILE ,"r"))
-        except Exception as e:
+            with csv.reader(open(config.JOB_FILE, "r")) as cr:
+                line = 0
+                for row in cr:
+                    line = line + 1
+                    self.load_job(row)
+        except IOError:
             print("Could not parse " + config.JOB_FILE + ", no jobs loaded.")
-            return
-        line = 0
-        for row in cr:
-            line = line + 1
-            try:
-                self.load_job(row)
-            except Exception as e:
-                print("Could not parse (and ignoring) line: " + str(line))
-                pass
+        except Exception:
+            print("Could not parse (and ignoring) line: " + str(line))
 
     def unload_jobs(self):
         print("Unloading jobs mentionned in " + config.DELETE_FILE + ": \n")
         try:
-            cr = csv.reader(open(config.DELETE_FILE ,"r"))
-        except Exception as e:
+            with csv.reader(open(config.DELETE_FILE, "r")) as cr:
+                line = 0
+                for row in cr:
+                    line = line + 1
+                    self.unload_job(row)
+        except IOError:
             print("Could not parse " + config.DELETE_FILE + ", no jobs unloaded.")
-            return
-        line = 0
-        for row in cr:
-            line = line + 1
-            try:
-                self.unload_job(row)
-            except Exception as e:
-                print("Could not parse (and ignoring) line: " + str(line))
-                pass
+        except Exception:
+            print("Could not parse (and ignoring) line: " + str(line))
 
     def update_jobs(self):
         self.load_jobs()
         self.unload_jobs()
 
     def run_jobs_now(self):
-        for job in self.jobs:
-            job.run()
+        for job_to_run in self.jobs:
+            job_to_run.run()
 
     def start(self):
         schedule.every(1).minutes.do(self.update_jobs)

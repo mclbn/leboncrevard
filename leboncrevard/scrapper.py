@@ -42,19 +42,19 @@ class LbcScrapper:
 
     def test_connectivity(self):
         req = requests.get(self.location)
-        if (req.status_code != 200):
+        if req.status_code != 200:
             return False
         return True
 
     def scrap(self):
         ad_list = []
         req = requests.get(self.location, params=self.params)
-        if (req.status_code != 200):
+        if req.status_code != 200:
             print("Request failed, status code is {:d}", req.status_code)
             return None
         soup = BeautifulSoup(req.content, "lxml")
         ads = soup.find('section', {"class": "tabsContent block-white dontSwitch"})
-        if ads == None:
+        if ads is None:
             print("No ads!")
             return None
         for li in ads.find_all('li'):
@@ -64,27 +64,27 @@ class LbcScrapper:
             datestr = ""
             try:
                 ass = a.find('aside', {"class": "item_absolute"})
-                p = ass.find('p');
+                p = ass.find('p')
                 for child in p.children:
                     if (len(child.string) > 1):
                         datestr += child.string
                         datestr += " "
                 datestr = re.sub('[\n+]', '', datestr).strip()
-            except:
+            except Exception:
                 print("Could not get date.")
             try:
                 price = a.find('h3', {"class": "item_price"}).string.strip()
-            except:
+            except Exception:
                 price = ""
             try:
                 ps = a.find_all('p', {"class": "item_supp"})
-            except:
+            except Exception:
                 print("No price")
                 ps = []
             placement = ""
             for p in ps:
                 if p and p.string:
-                    if p.string.count("\n") > 4: # This is the only way I found to differentiate these fields...
+                    if p.string.count("\n") > 4:  # This is the only way I found to differentiate these fields...
                         placement = re.sub('[\s+]', '', p.string)
                         break
             try:
@@ -98,10 +98,10 @@ class LbcScrapper:
                     m = hashlib.md5()
                     m.update(description.text.encode('utf-8'))
                     content_hash = m.hexdigest()
-                except:
+                except Exception:
                     print("No description!")
                     content_hash = ""
-            except:
+            except Exception:
                 content_hash = ""
             ad = LbcAd(title, link, datestr, price, placement, content_hash)
             ad_list.append(ad)
