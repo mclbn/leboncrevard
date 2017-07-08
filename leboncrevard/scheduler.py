@@ -47,7 +47,8 @@ class LbcScheduler:
     def load_jobs(self):
         print("Loading new jobs from " + config.JOB_FILE + ": \n")
         try:
-            with csv.reader(open(config.JOB_FILE, "r")) as cr:
+            with open(config.JOB_FILE) as handler:
+                cr = csv.reader(handler)
                 for line, row in enumerate(cr, 1):
                     try:
                         self.load_job(row)
@@ -59,7 +60,8 @@ class LbcScheduler:
     def unload_jobs(self):
         print("Unloading jobs mentionned in " + config.DELETE_FILE + ": \n")
         try:
-            with csv.reader(open(config.DELETE_FILE, "r")) as cr:
+            with open(config.DELETE_FILE) as handler:
+                cr = csv.reader(handler)
                 for line, row in enumerate(cr, 1):
                     try:
                         self.unload_job(row)
