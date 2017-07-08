@@ -48,27 +48,25 @@ class LbcScheduler:
         print("Loading new jobs from " + config.JOB_FILE + ": \n")
         try:
             with csv.reader(open(config.JOB_FILE, "r")) as cr:
-                line = 0
-                for row in cr:
-                    line = line + 1
-                    self.load_job(row)
+                for line, row in enumerate(cr, 1):
+                    try:
+                        self.load_job(row)
+                    except StandardError:
+                        print("Could not parse (and ignoring) line: " + str(line))
         except IOError:
             print("Could not parse " + config.JOB_FILE + ", no jobs loaded.")
-        except Exception:
-            print("Could not parse (and ignoring) line: " + str(line))
 
     def unload_jobs(self):
         print("Unloading jobs mentionned in " + config.DELETE_FILE + ": \n")
         try:
             with csv.reader(open(config.DELETE_FILE, "r")) as cr:
-                line = 0
-                for row in cr:
-                    line = line + 1
-                    self.unload_job(row)
+                for line, row in enumerate(cr, 1):
+                    try:
+                        self.unload_job(row)
+                    except StandardError:
+                        print("Could not parse (and ignoring) line: " + str(line))
         except IOError:
             print("Could not parse " + config.DELETE_FILE + ", no jobs unloaded.")
-        except Exception:
-            print("Could not parse (and ignoring) line: " + str(line))
 
     def update_jobs(self):
         self.load_jobs()
